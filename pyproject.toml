@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-multi-clone"
+description = "CLI tool to clone multiple git repositories"
+authors = [
+    { name = "Federico Oberndorfer", email = "federico.ober@hotmail.com" },
+]
+license = { text = "MIT License" }
+dependencies = [
+    "typer>=0.4.0",
+    "GitPython>=3.1.0",
+    "pydantic>=2.0.0",
+    "toml>=0.10.2",
+]
+readme = "README.md"
+dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/federicober/git-multi-clone"
+
+[project.optional-dependencies]
+dev = ["pytest>=6.0", "mypy>=0.910", "ruff>=0.0.262", "types-toml"]
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+
+[project.scripts]
+git-multi-clone = "git_multi_clone.__main__:app"
+
+[tool.pytest.ini_options]
+addopts = "--tb=short"
+testpaths = ["tests"]
+
+[tool.mypy]
+files = ["src", "tests"]
+python_version = "3.9"
+strict = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "B",
+    "I",
+    "C90",
+    "N",
+    "UP",
+    "S",
+    "A",
+    "PIE",
+    "SIM",
+    "RSE",
+    "RET",
+    "PGH",
+    "PERF",
+    "RUF",
+    "FLY",
+    "ICN",
+    "ISC",
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"**/cli.py" = ["B008"]
+"tests/**" = ["S101"]

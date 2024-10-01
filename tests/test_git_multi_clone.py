@@ -4,11 +4,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from git_multi_clone import (
-    app,
-    load_config,
-    run_clone_process,
-)
+from git_multi_clone.cli import app
+from git_multi_clone.multi_clone import load_config, main
 
 # Initialize the Typer test runner
 runner = CliRunner()
@@ -80,13 +77,13 @@ def test_load_config_invalid_file_directory_already_exists(
 
 
 # Test cases for directory creation and cloning
-@patch("git_multi_clone.Repo.clone_from")
+@patch("git_multi_clone.multi_clone.Repo.clone_from")
 def test_run_clone_process(
     mock_clone_from: MagicMock, config_path: Path, workdir: Path
 ) -> None:
     with patch("pathlib.Path.mkdir") as mock_mkdir:
         # Run the cloning process
-        run_clone_process(config_path)
+        main(config_path)
 
         # Ensure the directory is created if it doesn't exist
         mock_mkdir.assert_called_once_with(parents=True)
@@ -101,21 +98,19 @@ def test_run_clone_process(
         )
 
 
-@patch("git_multi_clone.Repo.clone_from", side_effect=Exception("Clone error"))
-def test_cli_integration_clone_error(
-    mock_clone_from: MagicMock, config_path: Path
-) -> None:
-    # Run the CLI and simulate a clone error
+def test_cli_integration_valid(tmp_path: Path) -> None:
+    config_path = tmp_path / "multi-repo.toml"
+    config_path.write_text(
+        f"""
+directory = "{tmp_path}"
+[repos]
+
+multi_clone = "git@github.com:federicober/git-multi-clone.git"
+"""
+    )
+
     result = runner.invoke(app, [str(config_path)])
 
-    assert result.exit_code == 1
-    assert "An unexpected error occurred" in result.output
-
-
-# # Test case for CLI integration
-# def test_cli_integration_valid(config_path: Path) -> None:
-#     # Run the CLI with the test runner
-#     result = runner.invoke(app, [str(config_path)])
-
-#     assert result.exit_code == 0
-#     assert "Successfully cloned" in result.output
+    print(result.stdout)
+    assert result.exit_code == 0
+    assert tmp_path.joinpath("multi_clone/.git").is_dir()
