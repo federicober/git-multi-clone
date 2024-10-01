@@ -1,5 +1,7 @@
 # Git Multi Clone
 
+![PyPI - Version](https://img.shields.io/pypi/v/git-multi-clone?label=pypi%20package&color=%3F%252334D058)
+
 `git-multi-clone` is a simple command-line tool to clone multiple Git repositories based on a declarative configuration file.
 
 It uses [GitPython](https://gitpython.readthedocs.io/en/stable/) to handle the repository cloning and [Typer](https://typer.tiangolo.com/) for the command-line interface.
